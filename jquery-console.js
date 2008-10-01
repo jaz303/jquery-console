@@ -1,6 +1,9 @@
+var zMax = 50000;
+function nextZ() { return zMax++; }
+
 if (window.__JQUERY_CONSOLE__) {
     
-  window.__JQUERY_CONSOLE__.toggle();
+  window.__JQUERY_CONSOLE__.css('zIndex', nextZ()).toggle();
 
 } else {
 
@@ -34,7 +37,8 @@ if (window.__JQUERY_CONSOLE__) {
   
     var $container = $('<div/>').css({
       backgroundColor: 'white', padding: '7px', position: 'absolute', opacity: 0.9,
-      top: '10px', right: '10px', width: '450px', border: '1px solid black'}).appendTo(document.body);
+      top: '10px', right: '10px', width: '450px', border: '1px solid black',
+      zIndex: nextZ()}).appendTo(document.body);
   
     $container.append($log).append($input);
   
