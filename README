@@ -1,0 +1,14 @@
+jQuery Console - JS Console Overlay Bookmarklet
+  (c) 2008 Jason Frame (jason@onehackoranother.com)
+  Released under The MIT License.
+
+Small bookmarklet which dynamically adds jQuery to the current page if not already present then presents a small console overlay for evaluating Javascript expressions.
+
+How to use:
+
+* run `rake` to generate out.html
+* open out.html in your browser
+* drag the "jQuery console" link to your bookmarks bar
+* click link to toggle visibility of console
+
+Mac users can replace steps 1 and 2 with `rake open`
