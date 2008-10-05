@@ -13,15 +13,22 @@
       
       var context = {},
           $log    = $('<div/>').css({fontSize: '11px', fontFamily: 'monospace', color: 'white', marginBottom: '7px', overflow: 'auto', height: '120px', border: '1px solid #a0a0a0', padding: '5px', textAlign: 'left'}),
-          $input  = $('<input type="text" />').css({border: '1px solid #a0a0a0', padding: '3px', width: '444px', fontSize: '11px'});
-
+          $input  = $('<input type="text" />').css({border: '1px solid #a0a0a0', padding: '3px', width: '444px', fontSize: '11px'}),
+          $dummy  = $('<div/>');
+          
       function evalIt(cmd) {
+        window.__JQUERY_CONSOLE__.appendTo($dummy);
         var retVal;
-        if (cmd.match(/^\$ /)) {
-          retVal = eval("$('" + cmd.substring(2) + "');");
-          retVal._SELECTOR_ = cmd.substring(2);
-        } else {
-          retVal = eval(cmd);
+        try {
+          if (cmd.match(/^\$ /)) {
+            retVal = eval("$('" + cmd.substring(2) + "');");
+            retVal._SELECTOR_ = cmd.substring(2);
+          } else {
+            retVal = eval(cmd);
+          }
+        } finally {
+          window.__JQUERY_CONSOLE__.appendTo(document.body);
+          $input[0].focus();
         }
         if (typeof retVal != 'undefined') {
           window._ = retVal;
