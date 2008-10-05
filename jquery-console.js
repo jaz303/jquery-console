@@ -10,12 +10,31 @@
   } else {
 
     function init() {
+      
+      var context = {},
+          $log    = $('<div/>').css({fontSize: '11px', fontFamily: 'monospace', color: 'white', marginBottom: '7px', overflow: 'auto', height: '120px', border: '1px solid #a0a0a0', padding: '5px', textAlign: 'left'}),
+          $input  = $('<input type="text" />').css({border: '1px solid #a0a0a0', padding: '3px', width: '444px', fontSize: '11px'});
 
-      var $log = $('<div/>').css({fontSize: '11px', fontFamily: 'monospace', color: 'white', marginBottom: '7px', overflow: 'auto', height: '120px', border: '1px solid #a0a0a0', padding: '5px', textAlign: 'left'});
-      var $input = $('<input type="text" />').css({border: '1px solid #a0a0a0', padding: '3px', width: '444px', fontSize: '11px'});
-
+      function evalIt(cmd) {
+        var retVal;
+        if (cmd.match(/^\$ /)) {
+          retVal = eval("$('" + cmd.substring(2) + "');");
+          retVal._SELECTOR_ = cmd.substring(2);
+        } else {
+          retVal = eval(cmd);
+        }
+        if (typeof retVal != 'undefined') {
+          window._ = retVal;
+        }
+        return retVal;
+      }
+      
       function format(value) {
-        return value.toString();
+        if (value && value._SELECTOR_) {
+          return "<jQuery selector: '" + value._SELECTOR_ + "' length: " + value.length + ">";
+        } else {
+          return value.toString();
+        }
       }
 
       function append(text, color) {
@@ -28,7 +47,7 @@
           try {
             var cmd = this.value;
             append('> ' + cmd);
-            append(format(eval(cmd)));
+            append(format(evalIt.call(context, cmd)));
           } catch (e) {
             append(e.toString(), '#ff0000');
           } finally {
@@ -43,6 +62,7 @@
         zIndex: nextZ()}).appendTo(document.body);
 
       $container.append($log).append($input);
+      $input[0].focus();
 
       append('jQuery console initialised!');
 
