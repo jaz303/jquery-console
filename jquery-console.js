@@ -1,7 +1,7 @@
 (function() {
-    
+  
   var zMax = 50000;
-  function nextZ() { return zMax++; }
+  function nextZ() { return zMax++; };
 
   if (window.__JQUERY_CONSOLE__) {
 
@@ -11,11 +11,37 @@
 
     function init() {
       
+      function HistoryManager() {
+        this.curr     = -1;
+        this.entries  = [];
+      };
+
+      HistoryManager.prototype = {
+        push: function(item) {
+          if (this.entries.length && this.entries[0] == item) return;
+          if (item.match(/^\s*$/)) return;
+          this.entries.unshift(item);
+          this.curr = -1;
+        },
+        scroll: function(direction) {
+          var moveTo = this.curr + (direction == 'prev' ? 1 : -1);
+          if (moveTo >= 0 && moveTo < this.entries.length) {
+            this.curr = moveTo;
+            return this.entries[this.curr];
+          } else if (moveTo == -1) {
+            return '';
+          } else {
+            return null;
+          }
+        }
+      };
+      
       var context = {},
+          history = new HistoryManager(),
           $log    = $('<div/>').css({fontSize: '11px', fontFamily: 'monospace', color: 'white', marginBottom: '7px', overflow: 'auto', height: '120px', border: '1px solid #a0a0a0', padding: '5px', textAlign: 'left'}),
           $input  = $('<input type="text" />').css({border: '1px solid #a0a0a0', padding: '3px', width: '444px', fontSize: '11px'}),
           $dummy  = $('<div/>');
-          
+
       function evalIt(cmd) {
         window.__JQUERY_CONSOLE__.appendTo($dummy);
         var retVal;
@@ -49,6 +75,14 @@
         $log[0].scrollTop = $log[0].scrollHeight;
       }
 
+      $input.keydown(function(evt) {
+        var valid = {38: 'prev', 40: 'next'};
+        if (evt.keyCode in valid) {
+          var curr = history.scroll(valid[evt.keyCode]);
+          if (curr !== null) $input.val(curr);
+        }
+      });
+
       $input.keypress(function(evt) {
         if (evt.keyCode == 13) {
           try {
@@ -58,8 +92,9 @@
           } catch (e) {
             append(e.toString(), '#ff0000');
           } finally {
+            history.push(cmd);
             this.value = '';
-          }
+          }          
         }
       });
 
