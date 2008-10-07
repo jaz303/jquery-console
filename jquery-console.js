@@ -38,6 +38,7 @@
       
       var context = {},
           history = new HistoryManager(),
+          $drag   = $('<div/>').css({backgroundColor: '#e0e0e0', border: '1px solid #a0a0a0', height: 21, marginBottom: '7px', cursor: 'pointer'}),
           $log    = $('<div/>').css({fontSize: '11px', fontFamily: 'monospace', color: 'white', marginBottom: '7px', overflow: 'auto', height: '120px', border: '1px solid #a0a0a0', padding: '5px', textAlign: 'left'}),
           $input  = $('<input type="text" />').css({border: '1px solid #a0a0a0', padding: '3px', width: '444px', fontSize: '11px'}),
           $dummy  = $('<div/>');
@@ -75,6 +76,19 @@
         $log[0].scrollTop = $log[0].scrollHeight;
       }
 
+      var dragging = null;
+      $drag.mousedown(function(evt) {
+        dragging = [evt.pageX - $container[0].offsetLeft,
+                    evt.pageY - $container[0].offsetTop];
+      }).mouseup(function() {
+        dragging = null;
+      });
+      
+      $(document).mousemove(function(evt) {
+        if (dragging) 
+          $container.css({left: evt.pageX - dragging[0], top: evt.pageY - dragging[1]});
+      });
+      
       $input.keydown(function(evt) {
         var valid = {38: 'prev', 40: 'next'};
         if (evt.keyCode in valid) {
@@ -105,7 +119,7 @@
         top: '10px', right: '10px', width: '450px', border: '1px solid black',
         zIndex: nextZ()}).appendTo(document.body);
 
-      $container.append($log).append($input);
+      $container.append($drag).append($log).append($input);
       $input[0].focus();
 
       append('jQuery console initialised!');
