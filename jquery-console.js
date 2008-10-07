@@ -98,8 +98,10 @@
         }
       });
 
+      var pos = ($.browser.msie && $.browser.version < 7) ? 'absolute' : 'fixed';
+
       var $container = $('<div/>').css({
-        backgroundColor: 'white', padding: '7px', position: 'absolute', opacity: 0.9,
+        backgroundColor: 'white', padding: '7px', position: pos, opacity: 0.9,
         top: '10px', right: '10px', width: '450px', border: '1px solid black',
         zIndex: nextZ()}).appendTo(document.body);
 
