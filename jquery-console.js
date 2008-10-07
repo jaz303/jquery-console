@@ -1,11 +1,8 @@
 (function() {
   
-  var zMax = 50000;
-  function nextZ() { return zMax++; };
-
   if (window.__JQUERY_CONSOLE__) {
 
-    window.__JQUERY_CONSOLE__.css('zIndex', nextZ()).toggle();
+    window.__JQUERY_CONSOLE__.toggle();
 
   } else {
 
@@ -29,6 +26,7 @@
             this.curr = moveTo;
             return this.entries[this.curr];
           } else if (moveTo == -1) {
+            this.curr = moveTo;
             return '';
           } else {
             return null;
@@ -38,7 +36,7 @@
       
       var context = {},
           history = new HistoryManager(),
-          $drag   = $('<div/>').css({backgroundColor: '#e0e0e0', border: '1px solid #a0a0a0', height: 21, marginBottom: '7px', cursor: 'pointer'}),
+          $drag   = $('<div/>').css({backgroundColor: '#e0e0e0', border: '1px solid #a0a0a0', fontSize: '11px', fontFamily: 'sans-serif', lineHeight: 1, padding: '5px', marginBottom: '7px', cursor: 'pointer', textAlign: 'right'}).html($('<a/>').text('[X]').click(function() { window.__JQUERY_CONSOLE__.hide(); })),
           $log    = $('<div/>').css({fontSize: '11px', fontFamily: 'monospace', color: 'white', marginBottom: '7px', overflow: 'auto', height: '120px', border: '1px solid #a0a0a0', padding: '5px', textAlign: 'left'}),
           $input  = $('<input type="text" />').css({border: '1px solid #a0a0a0', padding: '3px', width: '444px', fontSize: '11px'}),
           $dummy  = $('<div/>');
@@ -116,8 +114,8 @@
 
       var $container = $('<div/>').css({
         backgroundColor: 'white', padding: '7px', position: pos, opacity: 0.9,
-        top: '10px', right: '10px', width: '450px', border: '1px solid black',
-        zIndex: nextZ()}).appendTo(document.body);
+        top: '10px', right: '10px', width: '450px', border: '1px solid black'
+      }).appendTo(document.body);
 
       $container.append($drag).append($log).append($input);
       $input[0].focus();
