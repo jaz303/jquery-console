@@ -1,12 +1,12 @@
 (function() {
-  
+
   if (window.__JQUERY_CONSOLE__) {
 
     window.__JQUERY_CONSOLE__.toggle();
 
   } else {
 
-    function init() {
+    function init($) {
       
       function HistoryManager() {
         this.curr     = -1;
@@ -114,7 +114,8 @@
 
       var $container = $('<div/>').css({
         backgroundColor: 'white', padding: '7px', position: pos, opacity: 0.9,
-        top: '10px', right: '10px', width: '450px', border: '1px solid black'
+        top: '10px', right: '10px', width: '450px', border: '1px solid black',
+        zIndex: 99999
       }).appendTo(document.body);
 
       $container.append($drag).append($log).append($input);
@@ -128,12 +129,15 @@
 
     if (typeof jQuery == 'undefined') {
       var e = document.createElement('script');
-      e.onload = init;
+      e.onload = function() {
+        jQuery.noConflict();
+        init(jQuery);
+      };
       e.setAttribute('type', 'text/javascript');
       e.setAttribute('src', 'http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js');
       document.body.appendChild(e);
     } else {
-      init();
+      init(jQuery);
     }          
 
   }
