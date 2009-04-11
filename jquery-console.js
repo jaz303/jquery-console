@@ -5,7 +5,7 @@
     window.__JQUERY_CONSOLE__.toggle();
 
   } else {
-
+    
     function init($) {
       
       function HistoryManager() {
@@ -40,40 +40,67 @@
           $log    = $('<div/>').css({fontSize: '11px', fontFamily: 'monospace', color: 'white', marginBottom: '7px', overflow: 'auto', height: '120px', border: '1px solid #a0a0a0', padding: '5px', textAlign: 'left'}),
           $input  = $('<input type="text" />').css({border: '1px solid #a0a0a0', padding: '3px', width: '444px', fontSize: '11px'}),
           $dummy  = $('<div/>');
-
+      
       function evalIt(cmd) {
         window.__JQUERY_CONSOLE__.appendTo($dummy);
-        var retVal;
+        var result;
         try {
-          if (cmd.match(/^\$ /)) {
-            retVal = eval("$('" + cmd.substring(2) + "');");
-            retVal._SELECTOR_ = cmd.substring(2);
+          if (cmd == 'reset!') {
+            context = {};
+            result  = true;
           } else {
-            retVal = eval(cmd);
+            if (cmd.match(/^\$ /)) cmd = "$('" + cmd.substring(2) + "');";
+            else cmd = '(' + cmd + ')';
+            var result = eval(cmd);
           }
         } finally {
           window.__JQUERY_CONSOLE__.appendTo(document.body);
           $input[0].focus();
         }
-        if (typeof retVal != 'undefined') {
-          window._ = retVal;
+        if (typeof result != 'undefined') {
+          window._ = result;
+          if (typeof result == 'object' && result.selector)
+            window._$ = result;
         }
-        return retVal;
-      }
+        return result;
+      };
       
       function format(value) {
-        if (value && value._SELECTOR_) {
-          return "<jQuery selector: '" + value._SELECTOR_ + "' length: " + value.length + ">";
-        } else {
+        if (value === null) {
+          return 'null';
+        } else if (typeof value == 'undefined') {
+          return 'undefined';
+        } else if (typeof value == 'string') {
+          return '"' + value.replace('"', '\\"') + '"';
+        } else if (typeof value == 'function' ||
+                   typeof value == 'number' ||
+                   value instanceof RegExp ||
+                   value === true || value === false) {
           return value.toString();
+        } else if (value.selector) {
+          return "<jQuery selector: '" + value.selector + "' length: " + value.length + ">";
+        } else if (value instanceof Array) {
+          return '[' + $.map(value, format).join(', ') + ']';
+        } else if (value instanceof Date) {
+          return "@" + value.getFullYear() +
+                 "-" + value.getMonth() +
+                 "-" + value.getDate() + 
+                 "T" + value.getHours() +
+                 ":" + value.getMinutes() +
+                 ":" + value.getSeconds() +
+                 "." + value.getMilliseconds();
+        } else {
+          var o = [];
+          for (var k in value) o.push(k + ': ' + format(value[k]));
+          return '{' + o.join(', ') + '}';
         }
-      }
-
+      };
+      
       function append(text, color) {
         $log.append($('<div/>').css({'color': color || 'black', margin: 0, padding: 0}).text(text));
         $log[0].scrollTop = $log[0].scrollHeight;
-      }
-
+      };
+      
       var dragging = null;
       $drag.mousedown(function(evt) {
         dragging = [evt.pageX - $container[0].offsetLeft,
@@ -94,7 +121,7 @@
           if (curr !== null) $input.val(curr);
         }
       });
-
+      
       $input.keypress(function(evt) {
         if (evt.keyCode == 13) {
           try {
@@ -121,25 +148,23 @@
       $container.append($drag).append($log).append($input);
       $input[0].focus();
 
-      append('jQuery console initialised!');
+      append('jQuery console initialised!', 'green');
+      append('(using jQuery version ' + $.fn.jquery + ')');
 
       window.__JQUERY_CONSOLE__ = $container;
+    
+    };
 
-    }
-
-    if (typeof jQuery == 'undefined') {
-      var e = document.createElement('script');
-      e.onload = function() {
-        jQuery.noConflict();
-        init(jQuery);
-      };
+    if (typeof jQuery == 'undefined' || !jQuery.fn.jquery.match(/^1\.3/)) {
+      var e = document.createElement('script'), jq = null;
+      e.onload = function() { jq = jQuery; jQuery.noConflict(true); init(jq); };
       e.setAttribute('type', 'text/javascript');
-      e.setAttribute('src', 'http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js');
+      e.setAttribute('src', 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js');
       document.body.appendChild(e);
     } else {
       init(jQuery);
-    }          
+    }
 
   }
-
+  
 })();
